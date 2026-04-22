@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/background-jobs",
+      "schedule": "*/30 * * * *"
+    },
+    {
+      "path": "/api/black-swan",
+      "schedule": "0 */2 * * *"
+    }
+  ]
+}
