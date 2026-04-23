@@ -1,1 +1,1 @@
-{"name":"apex-trading-system","version":"13.0.0","dependencies":{"@vercel/kv":"^1.0.0"},"engines":{"node":">=18.x"}}
+{"name":"apex-trading","version":"1.0.0","dependencies":{"@vercel/kv":"^1.0.0"}}
