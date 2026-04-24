@@ -8,6 +8,6 @@ export default async function handler(req, res) {
     await safeKVSet('regime:current', result);
     res.status(200).json(result);
   } catch(e) {
-    res.status(200).json({ regime: 'WEAK_BULL' });
+    res.status(200).json({ regime: 'WEAK_BULL', settings: { kellyFraction: 0.25, maxPos: 30, breakout: true, pullback: true, inverse: false, sizeMultiplier: 0.8 } });
   }
 }
