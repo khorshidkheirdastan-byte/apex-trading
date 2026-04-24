@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html dir="rtl">
+<head><meta charset="UTF-8"><title>APEX Trading</title>
+<style>body{background:#0a0d12;color:#00e5a0;font-family:monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0}
+h1{font-size:3rem;letter-spacing:8px}p{color:#8899aa}.btn{background:#0e1520;border:1px solid #00e5a0;color:#00e5a0;padding:12px 24px;margin:8px;cursor:pointer;font-family:monospace;font-size:14px;border-radius:4px;text-decoration:none;display:inline-block}</style></head>
+<body>
+<h1>APEX</h1>
+<p>سیستم معاملاتی هوشمند</p>
+<div id="status">در حال بررسی...</div>
+<br>
+<a class="btn" href="/api/market-regime">رژیم بازار</a>
+<a class="btn" id="pipeline-btn">اجرای Pipeline</a>
+<div id="result" style="margin-top:20px;max-width:600px;word-break:break-all;color:#c8d8e8"></div>
+<script>
+fetch("/api/market-regime").then(r=>r.json()).then(d=>{
+  document.getElementById("status").innerHTML=`رژیم: <strong>${d.regime}</strong>`;
+});
+document.getElementById("pipeline-btn").onclick=()=>{
+  document.getElementById("result").textContent="در حال اجرا...";
+  fetch("/api/pipeline",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({holdings:[]})})
+  .then(r=>r.json()).then(d=>{
+    document.getElementById("result").textContent=JSON.stringify(d,null,2);
+  });
+};
+</script>
+</body></html>
