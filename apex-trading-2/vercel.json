@@ -1,1 +1,9 @@
-{"version":2,"functions":{"api/*.js":{"maxDuration":30}}}
+{
+  "version": 2,
+  "functions": {
+    "api/*.js": { "maxDuration": 30 }
+  },
+  "rewrites": [
+    { "source": "/price/:symbol", "destination": "/api/price?symbol=:symbol" }
+  ]
+}
