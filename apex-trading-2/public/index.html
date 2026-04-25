@@ -1,26 +1,451 @@
 <!DOCTYPE html>
-<html dir="rtl">
-<head><meta charset="UTF-8"><title>APEX Trading</title>
-<style>body{background:#0a0d12;color:#00e5a0;font-family:monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0}
-h1{font-size:3rem;letter-spacing:8px}p{color:#8899aa}.btn{background:#0e1520;border:1px solid #00e5a0;color:#00e5a0;padding:12px 24px;margin:8px;cursor:pointer;font-family:monospace;font-size:14px;border-radius:4px;text-decoration:none;display:inline-block}</style></head>
+<html dir="rtl" lang="fa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APEX Trading</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Vazirmatn:wght@400;700;900&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #00ffc8;
+    --red: #ff4d6d;
+    --blue: #38bdf8;
+    --bg: #020818;
+    --card: #0f172a;
+    --border: #1e293b;
+    --muted: #64748b;
+    --text: #e2e8f0;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Vazirmatn', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* LOGIN */
+  #login-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 50% 0%, #00ffc811 0%, transparent 60%);
+  }
+  .login-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 48px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    min-width: 320px;
+    box-shadow: 0 0 80px #00ffc80d;
+  }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-hex { font-size: 36px; color: var(--green); }
+  .logo-text { font-size: 26px; font-weight: 900; letter-spacing: 6px; color: var(--text); }
+  .logo-sub { font-size: 10px; color: var(--muted); letter-spacing: 3px; align-self: flex-end; margin-bottom: 4px; }
+  .login-hint { color: var(--muted); font-size: 14px; }
+  .pin-dots { display: flex; gap: 16px; }
+  .pin-dot {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 2px solid var(--border);
+    background: transparent;
+    transition: all 0.2s;
+  }
+  .pin-dot.filled { background: var(--green); border-color: var(--green); }
+  .pin-error { color: var(--red); font-size: 13px; }
+  .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .num-btn {
+    width: 68px; height: 68px; border-radius: 14px;
+    background: #1e293b; border: 1px solid var(--border);
+    color: var(--text); font-size: 22px; font-weight: 700;
+    cursor: pointer; transition: all 0.15s; font-family: 'Share Tech Mono', monospace;
+  }
+  .num-btn:hover { background: #263548; border-color: var(--green); color: var(--green); }
+  .num-btn.empty { opacity: 0; pointer-events: none; }
+  .login-btn {
+    width: 100%; padding: 14px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--green), var(--blue));
+    border: none; color: #020818;
+    font-size: 16px; font-weight: 900;
+    cursor: pointer; letter-spacing: 2px;
+    font-family: 'Vazirmatn', sans-serif;
+    transition: opacity 0.2s;
+  }
+  .login-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* DASHBOARD */
+  #dashboard { display: none; }
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 32px;
+    border-bottom: 1px solid var(--border);
+    background: #0a162899;
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .header-title { font-size: 18px; font-weight: 900; letter-spacing: 4px; }
+  .header-sub { font-size: 11px; color: var(--muted); }
+  .header-right { display: flex; align-items: center; gap: 14px; }
+  .update-time { font-size: 12px; color: var(--muted); font-family: 'Share Tech Mono', monospace; }
+
+  .status-badge {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 16px; border-radius: 100px;
+    border: 1px solid; font-size: 12px; font-weight: 700; letter-spacing: 1px;
+    transition: all 0.4s;
+  }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  main { padding: 32px; max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px; }
+
+  .section-label {
+    font-size: 10px; font-weight: 700; color: var(--muted);
+    letter-spacing: 4px; text-transform: uppercase; margin-bottom: 14px;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  /* REGIME */
+  .regime-box {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 22px 28px;
+    display: flex; align-items: center; gap: 16px;
+    font-size: 26px; font-weight: 900; color: var(--green);
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 2px;
+  }
+  .regime-icon { font-size: 34px; }
+
+  /* PRICES */
+  .prices-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 14px;
+  }
+  .price-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 18px 20px;
+    display: flex; flex-direction: column; gap: 10px;
+    transition: border-color 0.3s;
+  }
+  .price-card:hover { border-color: #334155; }
+  .price-card-top { display: flex; align-items: center; gap: 10px; }
+  .sym-icon { font-size: 22px; }
+  .sym-ticker { font-size: 15px; font-weight: 900; letter-spacing: 2px; font-family: 'Share Tech Mono', monospace; }
+  .sym-label { font-size: 10px; color: var(--muted); }
+  .price-val { font-size: 18px; font-weight: 700; font-family: 'Share Tech Mono', monospace; }
+  .change-chip {
+    display: inline-block; padding: 2px 10px;
+    border-radius: 100px; font-size: 11px; font-weight: 700;
+    margin-top: 2px; font-family: 'Share Tech Mono', monospace;
+  }
+
+  /* PIPELINE */
+  .pipeline-btn {
+    padding: 16px 36px;
+    background: linear-gradient(135deg, var(--green), var(--blue));
+    border: none; border-radius: 14px;
+    color: #020818; font-size: 15px; font-weight: 900;
+    cursor: pointer; letter-spacing: 2px;
+    font-family: 'Vazirmatn', sans-serif;
+    display: flex; align-items: center; gap: 10px;
+    transition: opacity 0.2s;
+  }
+  .pipeline-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .pipeline-result {
+    margin-top: 14px; padding: 16px 20px;
+    border-radius: 12px; border: 1px solid;
+    font-size: 13px;
+  }
+  .pipeline-msg { margin-top: 6px; color: var(--muted); font-size: 12px; word-break: break-all; }
+
+  .muted { color: var(--muted); font-size: 14px; }
+  .spin { display: inline-block; animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .refresh-btn {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--muted); padding: 6px 14px; border-radius: 8px;
+    cursor: pointer; font-size: 12px; font-family: 'Vazirmatn', sans-serif;
+    transition: all 0.2s;
+  }
+  .refresh-btn:hover { border-color: var(--green); color: var(--green); }
+</style>
+</head>
 <body>
-<h1>APEX</h1>
-<p>سیستم معاملاتی هوشمند</p>
-<div id="status">در حال بررسی...</div>
-<br>
-<a class="btn" href="/api/market-regime">رژیم بازار</a>
-<a class="btn" id="pipeline-btn">اجرای Pipeline</a>
-<div id="result" style="margin-top:20px;max-width:600px;word-break:break-all;color:#c8d8e8"></div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="logo">
+      <span class="logo-hex">⬡</span>
+      <span class="logo-text">APEX</span>
+      <span class="logo-sub">TRADING</span>
+    </div>
+    <p class="login-hint">کد ۴ رقمی خود را وارد کنید</p>
+    <div class="pin-dots">
+      <div class="pin-dot" id="d0"></div>
+      <div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div>
+      <div class="pin-dot" id="d3"></div>
+    </div>
+    <p class="pin-error" id="pin-error" style="display:none">کد اشتباه است. دوباره تلاش کنید.</p>
+    <div class="numpad" id="numpad"></div>
+    <button class="login-btn" id="login-btn" disabled onclick="doLogin()">ورود</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <header>
+    <div class="header-left">
+      <span style="font-size:28px;color:var(--green)">⬡</span>
+      <div>
+        <div class="header-title">APEX TRADING</div>
+        <div class="header-sub">سیستم معاملات هوشمند</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="update-time" id="update-time"></span>
+      <button class="refresh-btn" onclick="refreshAll()">↻ بروزرسانی</button>
+      <div class="status-badge" id="status-badge">
+        <span class="status-dot" id="status-dot"></span>
+        <span id="status-text">در حال بارگذاری...</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Regime -->
+    <section>
+      <div class="section-label">رژیم بازار</div>
+      <div class="regime-box" id="regime-box">
+        <span class="regime-icon" id="regime-icon">⏳</span>
+        <span id="regime-text">در حال بارگذاری...</span>
+      </div>
+    </section>
+
+    <!-- Prices -->
+    <section>
+      <div class="section-label">قیمت‌های زنده</div>
+      <div class="prices-grid" id="prices-grid"></div>
+    </section>
+
+    <!-- Pipeline -->
+    <section>
+      <div class="section-label">اجرای Pipeline</div>
+      <button class="pipeline-btn" id="pipeline-btn" onclick="runPipeline()">
+        ▶&nbsp; اجرای Pipeline
+      </button>
+      <div id="pipeline-result" style="display:none" class="pipeline-result"></div>
+    </section>
+  </main>
+</div>
+
 <script>
-fetch("/api/market-regime").then(r=>r.json()).then(d=>{
-  document.getElementById("status").innerHTML=`رژیم: <strong>${d.regime}</strong>`;
+const SYMBOLS = [
+  { sym: "NVDA", label: "NVIDIA",   icon: "🟢" },
+  { sym: "AAPL", label: "Apple",    icon: "🍎" },
+  { sym: "TSLA", label: "Tesla",    icon: "⚡" },
+  { sym: "META", label: "Meta",     icon: "🔵" },
+  { sym: "SPY",  label: "S&P 500",  icon: "📈" },
+  { sym: "BTC",  label: "بیت‌کوین", icon: "₿"  },
+  { sym: "GOLD", label: "طلا",      icon: "🥇" },
+];
+
+let pin = "";
+let prevPrices = {};
+let prices = {};
+
+// ── NUMPAD ──────────────────────────────────────────────
+const keys = [1,2,3,4,5,6,7,8,9,"",0,"⌫"];
+const numpad = document.getElementById("numpad");
+keys.forEach(k => {
+  const btn = document.createElement("button");
+  btn.className = "num-btn" + (k === "" ? " empty" : "");
+  btn.textContent = k;
+  btn.onclick = () => {
+    if (k === "⌫") { pin = pin.slice(0,-1); }
+    else if (k !== "" && pin.length < 4) { pin += k; }
+    updateDots();
+  };
+  numpad.appendChild(btn);
 });
-document.getElementById("pipeline-btn").onclick=()=>{
-  document.getElementById("result").textContent="در حال اجرا...";
-  fetch("/api/pipeline",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({holdings:[]})})
-  .then(r=>r.json()).then(d=>{
-    document.getElementById("result").textContent=JSON.stringify(d,null,2);
+
+function updateDots() {
+  for(let i=0;i<4;i++) {
+    document.getElementById("d"+i).classList.toggle("filled", pin.length > i);
+  }
+  document.getElementById("login-btn").disabled = pin.length < 4;
+  document.getElementById("pin-error").style.display = "none";
+}
+
+function doLogin() {
+  if (pin === "1234") {
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("dashboard").style.display = "block";
+    initDashboard();
+  } else {
+    document.getElementById("pin-error").style.display = "block";
+    pin = ""; updateDots();
+  }
+}
+
+// ── DASHBOARD ───────────────────────────────────────────
+function initDashboard() {
+  buildPriceCards();
+  refreshAll();
+  setInterval(refreshAll, 15000);
+}
+
+function buildPriceCards() {
+  const grid = document.getElementById("prices-grid");
+  SYMBOLS.forEach(({ sym, label, icon }) => {
+    grid.innerHTML += `
+      <div class="price-card" id="card-${sym}">
+        <div class="price-card-top">
+          <span class="sym-icon">${icon}</span>
+          <div>
+            <div class="sym-ticker">${sym}</div>
+            <div class="sym-label">${label}</div>
+          </div>
+        </div>
+        <div class="price-val" id="price-${sym}"><span class="muted">...</span></div>
+      </div>`;
   });
-};
+}
+
+async function refreshAll() {
+  fetchStatus();
+  fetchRegime();
+  fetchPrices();
+  const now = new Date();
+  document.getElementById("update-time").textContent =
+    "آخرین بروزرسانی: " + now.toLocaleTimeString("fa-IR");
+}
+
+async function fetchStatus() {
+  try {
+    const r = await fetch("/api/market-regime");
+    const d = await r.json();
+    const active = (d.status || d.system_status || "").toUpperCase() === "ACTIVE"
+                || (d.regime || "").length > 0;
+    const badge = document.getElementById("status-badge");
+    const dot = document.getElementById("status-dot");
+    const txt = document.getElementById("status-text");
+    if (active) {
+      badge.style.cssText = "border-color:var(--green);color:var(--green);background:#00ffc811;display:flex;align-items:center;gap:8px;padding:6px 16px;border-radius:100px;border:1px solid;font-size:12px;font-weight:700;letter-spacing:1px;";
+      dot.style.background = "var(--green)";
+      txt.textContent = "ACTIVE";
+    } else {
+      badge.style.cssText = "border-color:var(--red);color:var(--red);background:#ff4d6d11;display:flex;align-items:center;gap:8px;padding:6px 16px;border-radius:100px;border:1px solid;font-size:12px;font-weight:700;letter-spacing:1px;";
+      dot.style.background = "var(--red)";
+      txt.textContent = "HOLD";
+    }
+  } catch { }
+}
+
+async function fetchRegime() {
+  try {
+    const r = await fetch("/api/market-regime");
+    const d = await r.json();
+    const reg = d.regime || d.market_regime || d.label || "نامشخص";
+    const icon = reg.toLowerCase().includes("bull") ? "🐂"
+               : reg.toLowerCase().includes("bear") ? "🐻" : "⚖️";
+    document.getElementById("regime-icon").textContent = icon;
+    document.getElementById("regime-text").textContent = reg;
+  } catch {
+    document.getElementById("regime-text").textContent = "خطا در دریافت داده";
+  }
+}
+
+async function fetchPrices() {
+  await Promise.all(SYMBOLS.map(async ({ sym }) => {
+    try {
+      const r = await fetch(`/price/${sym}`);
+      const d = await r.json();
+      const price = d.price ?? d.close ?? d.value ?? null;
+      if (price !== null) {
+        const prev = prices[sym];
+        prevPrices[sym] = prev;
+        prices[sym] = price;
+        renderPrice(sym, price, prev);
+      }
+    } catch {
+      document.getElementById("price-" + sym).innerHTML = `<span class="muted">خطا</span>`;
+    }
+  }));
+}
+
+function renderPrice(sym, price, prev) {
+  const el = document.getElementById("price-" + sym);
+  const formatted = typeof price === "number"
+    ? price.toLocaleString("en-US", { maximumFractionDigits: 2 })
+    : price;
+
+  let chipHTML = "";
+  if (prev != null && prev !== price) {
+    const pct = ((price - prev) / prev) * 100;
+    const up = pct > 0;
+    const color = up ? "var(--green)" : "var(--red)";
+    const bg = up ? "#00ffc822" : "#ff4d6d22";
+    const arrow = up ? "▲" : "▼";
+    chipHTML = `<br><span class="change-chip" style="color:${color};background:${bg}">${arrow} ${Math.abs(pct).toFixed(2)}%</span>`;
+  }
+
+  const color = prev == null ? "var(--text)"
+    : price > prev ? "var(--green)"
+    : price < prev ? "var(--red)" : "var(--text)";
+
+  el.innerHTML = `<span style="color:${color}">${formatted}</span>${chipHTML}`;
+}
+
+async function runPipeline() {
+  const btn = document.getElementById("pipeline-btn");
+  const res = document.getElementById("pipeline-result");
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spin">⟳</span>&nbsp; در حال اجرا...`;
+  res.style.display = "none";
+
+  try {
+    const r = await fetch("/api/pipeline", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ holdings: [] })
+    });
+    const d = await r.json();
+    res.style.display = "block";
+    res.style.borderColor = r.ok ? "var(--green)" : "var(--red)";
+    res.style.background = r.ok ? "#00ffc808" : "#ff4d6d08";
+    res.innerHTML = `<span style="color:${r.ok ? 'var(--green)' : 'var(--red)'}">
+      ${r.ok ? "✓ Pipeline با موفقیت اجرا شد" : "✗ خطا در اجرا"}</span>
+      <div class="pipeline-msg">${JSON.stringify(d, null, 2)}</div>`;
+  } catch (e) {
+    res.style.display = "block";
+    res.style.borderColor = "var(--red)";
+    res.style.background = "#ff4d6d08";
+    res.innerHTML = `<span style="color:var(--red)">✗ خطا در ارتباط با سرور</span>`;
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = "▶&nbsp; اجرای Pipeline";
+}
 </script>
-</body></html>
+</body>
+</html>
